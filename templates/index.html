@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Firebase Example</title>
+  </head>
+  <body>
+    <div id="firebaseui-auth-container">
+      <!-- This is where the Login ui will load -->
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.8.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.8.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
+    <script type="module">
+      // 1) Create a new firebaseui.auth instance stored to our local variable ui
+      const firebaseConfig = {
+      };
+    
+      // Initialize Firebase
+      const app = firebase.initializeApp(firebaseConfig);
+
+      const ui = new firebaseui.auth.AuthUI(firebase.auth())
+      // 2) These are our configurations.
+      const uiConfig = {
+        callbacks: {
+          signInSuccessWithAuthResult(authResult, redirectUrl) {
+	    authResult.user.getIdToken().then(function(idToken) {
+	      console.log(idToken);
+	      var xhr = new XMLHttpRequest();
+	      xhr.open("POST", "/sessionLogin", true);
+	      xhr.setRequestHeader('Content-Type', 'application/json');
+	      xhr.send(JSON.stringify({
+		idToken: idToken
+	      }));
+	    });
+            return false
+          }
+        },
+        signInFlow: "popup",
+        signInSuccessUrl: "signedIn",
+        signInOptions: [
+          firebase.auth.EmailAuthProvider.PROVIDER_ID,
+          firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+          // Additional login options should be listed here
+          // once they are enabled within the console.
+        ],
+      }
+      
+      // 3) Call the 'start' method on our ui class
+      // including our configuration options.
+      ui.start("#firebaseui-auth-container", uiConfig)      
+    </script>
+  </body>
+</html>
